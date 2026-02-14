@@ -3,19 +3,57 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
-// MCP Handshake Endpoint
+// MCP Protocol
 app.post("/", (req, res) => {
+
+  const { method, id } = req.body;
+
+  // Handshake
+  if (method === "initialize") {
+    return res.json({
+      jsonrpc: "2.0",
+      id,
+      result: {
+        protocolVersion: "2024-11-05",
+        capabilities: {
+          tools: {}
+        },
+        serverInfo: {
+          name: "ShoJablak MCP",
+          version: "1.0.0"
+        }
+      }
+    });
+  }
+
+  // Tools List (THIS WAS MISSING)
+  if (method === "tools/list") {
+    return res.json({
+      jsonrpc: "2.0",
+      id,
+      result: {
+        tools: [
+          {
+            name: "authUser",
+            description: "Authenticate user",
+            inputSchema: {
+              type: "object",
+              properties: {
+                phone: { type: "string" },
+                password: { type: "string" }
+              },
+              required: ["phone", "password"]
+            }
+          }
+        ]
+      }
+    });
+  }
+
   res.json({
     jsonrpc: "2.0",
-    id: req.body.id,
-    result: {
-      protocolVersion: "2024-11-05",
-      capabilities: {},
-      serverInfo: {
-        name: "ShoJablak MCP",
-        version: "1.0.0"
-      }
-    }
+    id,
+    result: {}
   });
 });
 
